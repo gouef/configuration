@@ -1,0 +1,38 @@
+parameters:
+  dns: "127.0.0.1"
+  debug: true
+
+renderer:
+  dir: ./views/templates
+  layout:
+    - @layout.gohtml
+    - base
+    - layout
+  test: lalala
+  extensions:
+    - test
+    - test2
+
+cache:
+  storages:
+    - type: "file"
+      instance: github.com/gouef/cache/File
+      name: default
+
+router:
+  statics:
+      - path: "/static"
+        root: "./static"
+      - path: "/assets"
+        root: "./static/assets"
+  extensions:
+    named: test
+    named2: test2
+    named3: 2
+    multi:
+      - test:
+          inner: true
+          pi: 3.14
+
+custom_section:
+  foo: bar

@@ -1,0 +1,56 @@
+name: Build and Push Docker image on Release
+
+on:
+  workflow_dispatch:
+#  workflow_run:
+#    workflows: ["Create Release"]
+#    types:
+#      - completed
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Get repository name
+        id: repo_name
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_OUTPUT
+
+      - name: Get latest release tag
+        id: get_tag
+        run: |
+          TAG=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:latest \
+                       -t ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ steps.get_tag.outputs.TAG }} .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ steps.repo_name.outputs.REPO_NAME }}:${{ steps.get_tag.outputs.TAG }}
+      - name: Upload README to Docker Hub
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          DESCRIPTION=$(jq -Rs '.' < README.md)
+
+          TOKEN=$(curl -s -H "Content-Type: application/json" \
+            -X POST -d '{"username": "'"$DOCKER_HUB_USERNAME"'", "password": "'"$DOCKER_HUB_TOKEN"'"}' \
+            https://hub.docker.com/v2/users/login/ | jq -r .token)
+
+          curl -X PATCH "https://hub.docker.com/v2/repositories/$DOCKER_HUB_USERNAME/$REPO_NAME/" \
+            -H "Authorization: JWT $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"full_description\": $DESCRIPTION}"

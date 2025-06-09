@@ -1,17 +1,20 @@
 package configuration
 
-import "gopkg.in/yaml.v3"
+import (
+	"github.com/gouef/configuration/helper"
+	"gopkg.in/yaml.v3"
+)
 
 type Renderer struct {
 	Dir    string   `yaml:"dir"`
 	Layout []string `yaml:"layout"`
-	Custom Custom
+	Custom helper.Custom
 }
 
 func (c *Renderer) UnmarshalYAML(value *yaml.Node) error {
 	type rawConfig Renderer
 	var raw rawConfig
-	custom, err := ParseKnownAndCustomAuto(value, &raw)
+	custom, err := helper.ParseKnownAndCustomAuto(value, &raw)
 	if err != nil {
 		return err
 	}

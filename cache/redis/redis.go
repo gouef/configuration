@@ -1,32 +1,18 @@
-package configuration
+package redis
 
 import (
 	"crypto/tls"
-	"gopkg.in/yaml.v3"
+	"github.com/gouef/configuration/helper"
 	"time"
 )
 
-type Cache struct {
-	Storages []CacheStorageItem `yaml:"storages"`
-	Custom   Custom
+type Redis struct {
+	Name    string  `yaml:"name"`
+	Options Options `yaml:"options"`
+	Custom  helper.Custom
 }
 
-type CacheStorageItem struct {
-	Type     string      `yaml:"type"`
-	Instance string      `yaml:"instance"`
-	Name     string      `yaml:"name"`
-	File     CacheFile   `yaml:"file"`
-	Memory   CacheMemory `yaml:"memory"`
-	Redis    CacheRedis  `yaml:"redis"`
-	Custom   Custom
-}
-
-type CacheRedis struct {
-	Name    string            `yaml:"name"`
-	Options CacheRedisOptions `yaml:"options"`
-}
-
-type CacheRedisOptions struct {
+type Options struct {
 	// The network type, either tcp or unix.
 	// Default is tcp.
 	Network string
@@ -137,22 +123,14 @@ type CacheRedisOptions struct {
 	UnstableResp3 bool
 }
 
-type CacheRedisOptionsTLS struct {
+type TLS struct {
 }
 
-type CacheMemory struct {
-	Name string `yaml:"name"`
-}
-
-type CacheFile struct {
-	Name string `yaml:"name"`
-	Dir  string `yaml:"dir"`
-}
-
+/*
 func (r *Cache) UnmarshalYAML(value *yaml.Node) error {
 	type rawConfig Cache
 	var raw rawConfig
-	custom, err := ParseKnownAndCustomAuto(value, &raw)
+	custom, err := configuration.ParseKnownAndCustomAuto(value, &raw)
 	if err != nil {
 		return err
 	}
@@ -164,7 +142,7 @@ func (r *Cache) UnmarshalYAML(value *yaml.Node) error {
 func (r *CacheStorageItem) UnmarshalYAML(value *yaml.Node) error {
 	type rawConfig CacheStorageItem
 	var raw rawConfig
-	custom, err := ParseKnownAndCustomAuto(value, &raw)
+	custom, err := configuration.ParseKnownAndCustomAuto(value, &raw)
 	if err != nil {
 		return err
 	}
@@ -172,3 +150,4 @@ func (r *CacheStorageItem) UnmarshalYAML(value *yaml.Node) error {
 	r.Custom = custom
 	return nil
 }
+*/

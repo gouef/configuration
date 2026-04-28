@@ -15,25 +15,25 @@ type Redis struct {
 type Options struct {
 	// The network type, either tcp or unix.
 	// Default is tcp.
-	Network string
+	Network string `yaml:"network"`
 	// host:port address.
-	Addr string
+	Addr string `yaml:"addr"`
 
 	// ClientName will execute the `CLIENT SETNAME ClientName` command for each conn.
-	ClientName string
+	ClientName string `yaml:"clientName"`
 
 	// Protocol 2 or 3. Use the version to negotiate RESP version with redis-server.
 	// Default is 3.
-	Protocol int
+	Protocol int `yaml:"protocol"`
 	// Use the specified Username to authenticate the current connection
 	// with one of the connections defined in the ACL list when connecting
 	// to a Redis 6.0 instance, or greater, that is using the Redis ACL system.
-	Username string
+	Username string `yaml:"username"`
 	// Optional password. Must match the password specified in the
 	// requirepass server configuration option (if connecting to a Redis 5.0 instance, or lower),
 	// or the User Password when connecting to a Redis 6.0 instance, or greater,
 	// that is using the Redis ACL system.
-	Password string
+	Password string `yaml:"password"`
 
 	// Database to be selected after connecting to the server.
 	DB int
@@ -124,6 +124,7 @@ type Options struct {
 }
 
 type TLS struct {
+	Certificates []Certificate
 }
 
 /*

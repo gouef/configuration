@@ -1,11 +1,12 @@
 package configuration
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/gouef/configuration/cache"
 	"github.com/gouef/configuration/helper"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path/filepath"
 )
 
 type ConfigInterface interface {
@@ -13,11 +14,12 @@ type ConfigInterface interface {
 }
 
 type Config struct {
-	Parameters map[string]any `yaml:"parameters"`
-	Renderer   Renderer       `yaml:"renderer"`
-	Router     Router         `yaml:"router"`
-	Cache      cache.Cache    `yaml:"cache"`
-	Diago      Diago          `yaml:"diago"`
+	Parameters map[string]any     `yaml:"parameters"`
+	Renderer   Renderer           `yaml:"renderer"`
+	Router     Router             `yaml:"router"`
+	Cache      cache.Cache        `yaml:"cache"`
+	Diago      Diago              `yaml:"diago"`
+	Gorm       GormDatabaseConfig `yaml:"gorm"`
 	Custom     helper.Custom
 }
 
